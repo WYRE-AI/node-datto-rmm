@@ -1,6 +1,6 @@
 {
   "name": "@wyre-ai/node-datto-rmm",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "type": "module",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"

@@ -1,3 +1,10 @@
+## [1.0.9](https://github.com/WYRE-AI/node-datto-rmm/compare/v1.0.8...v1.0.9) (2026-08-25)
+
+
+### Bug Fixes
+
+* **deps:** ignore undici (nested-unreachable) and esbuild (peer-capped) in dependabot ([#63](https://github.com/WYRE-AI/node-datto-rmm/issues/63)) ([399060e](https://github.com/WYRE-AI/node-datto-rmm/commit/399060e0e6223123591b71a6edc0a6bf4eb38baf))
+
 ## [1.0.8](https://github.com/WYRE-AI/node-datto-rmm/compare/v1.0.7...v1.0.8) (2026-08-25)
 
 
