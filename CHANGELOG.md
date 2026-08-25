@@ -1,3 +1,10 @@
+## [1.0.8](https://github.com/WYRE-AI/node-datto-rmm/compare/v1.0.7...v1.0.8) (2026-08-25)
+
+
+### Bug Fixes
+
+* migrate to WYRE-AI org (npm scope, ghcr namespace, registry) ([#62](https://github.com/WYRE-AI/node-datto-rmm/issues/62)) ([9a4cdde](https://github.com/WYRE-AI/node-datto-rmm/commit/9a4cdde9b70914a90b39b337990caa2dd7a634c4))
+
 ## [1.0.7](https://github.com/WYRE-AI/node-datto-rmm/compare/v1.0.6...v1.0.7) (2026-08-13)
 
 
