@@ -1,5 +1,5 @@
 {
-  "name": "@wyre-technology/node-datto-rmm",
+  "name": "@wyre-ai/node-datto-rmm",
   "version": "1.0.7",
   "type": "module",
   "publishConfig": {
@@ -52,12 +52,12 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wyre-technology/node-datto-rmm.git"
+    "url": "git+https://github.com/WYRE-AI/node-datto-rmm.git"
   },
   "bugs": {
-    "url": "https://github.com/wyre-technology/node-datto-rmm/issues"
+    "url": "https://github.com/WYRE-AI/node-datto-rmm/issues"
   },
-  "homepage": "https://github.com/wyre-technology/node-datto-rmm#readme",
+  "homepage": "https://github.com/WYRE-AI/node-datto-rmm#readme",
   "engines": {
     "node": ">=22.0.0"
   },
