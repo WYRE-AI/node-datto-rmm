@@ -38,6 +38,22 @@ updates:
       # tsup/DTS toolchain support TS7.
       - dependency-name: "typescript"
         update-types: ["version-update:semver-major"]
+      # undici (GHSA, security-update job) is unreachable: the only copy Dependabot
+      # can resolve to is node_modules/npm/node_modules/undici@6.27.0, nested inside
+      # npm's own bundled dependency tree -- same shape as this fleet's node-halopsa
+      # (wyre-technology/node-halopsa#67) and the 7-repo batch fixed 2026-08-25
+      # (WYRE-AI/node-ninjaone#74 etc). The reachable top-level undici (^7.0.0) is
+      # already on a patched version; this ignore only stops Dependabot repeatedly
+      # failing on the unreachable nested copy. Revisit once npm bundles a patched
+      # undici.
+      - dependency-name: "undici"
+      # esbuild (GHSA, security-update job) is genuinely peer-capped, not
+      # nested-unreachable: tsup@8.5.1 requires esbuild@^0.27.0, so 0.27.7 is the
+      # highest version npm's resolver can install (confirmed via the job's own
+      # conflicting-dependencies report, fix_available:false). Not fixable here
+      # without a tsup major bump. Revisit once tsup relaxes/bumps its esbuild peer
+      # range.
+      - dependency-name: "esbuild"
 
   - package-ecosystem: "github-actions"
     directory: "/"
