@@ -1,52 +1,52 @@
-## [1.0.7](https://github.com/wyre-technology/node-datto-rmm/compare/v1.0.6...v1.0.7) (2026-08-13)
+## [1.0.7](https://github.com/WYRE-AI/node-datto-rmm/compare/v1.0.6...v1.0.7) (2026-08-13)
 
 
 ### Bug Fixes
 
-* **deps:** pin typescript back to ^5.9.3, main is broken on 7.0.2 (again) ([#57](https://github.com/wyre-technology/node-datto-rmm/issues/57)) ([1d0443e](https://github.com/wyre-technology/node-datto-rmm/commit/1d0443ea61f8448631101298dae7815cabf53205)), closes [#54](https://github.com/wyre-technology/node-datto-rmm/issues/54) [#49](https://github.com/wyre-technology/node-datto-rmm/issues/49) [#43](https://github.com/wyre-technology/node-datto-rmm/issues/43) [#49](https://github.com/wyre-technology/node-datto-rmm/issues/49) [#49](https://github.com/wyre-technology/node-datto-rmm/issues/49)
+* **deps:** pin typescript back to ^5.9.3, main is broken on 7.0.2 (again) ([#57](https://github.com/WYRE-AI/node-datto-rmm/issues/57)) ([1d0443e](https://github.com/WYRE-AI/node-datto-rmm/commit/1d0443ea61f8448631101298dae7815cabf53205)), closes [#54](https://github.com/WYRE-AI/node-datto-rmm/issues/54) [#49](https://github.com/WYRE-AI/node-datto-rmm/issues/49) [#43](https://github.com/WYRE-AI/node-datto-rmm/issues/43) [#49](https://github.com/WYRE-AI/node-datto-rmm/issues/49) [#49](https://github.com/WYRE-AI/node-datto-rmm/issues/49)
 
-## [1.0.6](https://github.com/wyre-technology/node-datto-rmm/compare/v1.0.5...v1.0.6) (2026-07-21)
-
-
-### Bug Fixes
-
-* **deps:** pin typescript back to ^5.9.3, main is broken on 7.0.2 ([#49](https://github.com/wyre-technology/node-datto-rmm/issues/49)) ([4ab6573](https://github.com/wyre-technology/node-datto-rmm/commit/4ab65736836121665fb78302816d666b81879acc)), closes [#46](https://github.com/wyre-technology/node-datto-rmm/issues/46) [45/#46](https://github.com/wyre-technology/node-datto-rmm/issues/46) [#46](https://github.com/wyre-technology/node-datto-rmm/issues/46) [#43](https://github.com/wyre-technology/node-datto-rmm/issues/43)
-
-## [1.0.5](https://github.com/wyre-technology/node-datto-rmm/compare/v1.0.4...v1.0.5) (2026-07-18)
+## [1.0.6](https://github.com/WYRE-AI/node-datto-rmm/compare/v1.0.5...v1.0.6) (2026-07-21)
 
 
 ### Bug Fixes
 
-* read HTTP response bodies exactly once ([#44](https://github.com/wyre-technology/node-datto-rmm/issues/44)) ([d22d392](https://github.com/wyre-technology/node-datto-rmm/commit/d22d392b6cc48b3c5269eaa6159f89f66a956235))
+* **deps:** pin typescript back to ^5.9.3, main is broken on 7.0.2 ([#49](https://github.com/WYRE-AI/node-datto-rmm/issues/49)) ([4ab6573](https://github.com/WYRE-AI/node-datto-rmm/commit/4ab65736836121665fb78302816d666b81879acc)), closes [#46](https://github.com/WYRE-AI/node-datto-rmm/issues/46) [45/#46](https://github.com/WYRE-AI/node-datto-rmm/issues/46) [#46](https://github.com/WYRE-AI/node-datto-rmm/issues/46) [#43](https://github.com/WYRE-AI/node-datto-rmm/issues/43)
 
-## [1.0.4](https://github.com/wyre-technology/node-datto-rmm/compare/v1.0.3...v1.0.4) (2026-06-08)
-
-
-### Bug Fixes
-
-* **security:** bump vitest + @vitest/coverage-v8 1.x -> 3.2.6 ([#25](https://github.com/wyre-technology/node-datto-rmm/issues/25)) ([b2a431c](https://github.com/wyre-technology/node-datto-rmm/commit/b2a431c0642c2ad1403e5f720914ed729480b8fe))
-
-## [1.0.3](https://github.com/wyre-technology/node-datto-rmm/compare/v1.0.2...v1.0.3) (2026-05-20)
+## [1.0.5](https://github.com/WYRE-AI/node-datto-rmm/compare/v1.0.4...v1.0.5) (2026-07-18)
 
 
 ### Bug Fixes
 
-* repair broken package exports and standardize on Node 22 ([#2](https://github.com/wyre-technology/node-datto-rmm/issues/2)) ([6c10201](https://github.com/wyre-technology/node-datto-rmm/commit/6c10201da1a5afc03994aac0f57666928d901df3))
+* read HTTP response bodies exactly once ([#44](https://github.com/WYRE-AI/node-datto-rmm/issues/44)) ([d22d392](https://github.com/WYRE-AI/node-datto-rmm/commit/d22d392b6cc48b3c5269eaa6159f89f66a956235))
 
-## [1.0.2](https://github.com/wyre-technology/node-datto-rmm/compare/v1.0.1...v1.0.2) (2026-04-06)
-
-
-### Bug Fixes
-
-* defensively unwrap API responses to handle direct returns ([62fa082](https://github.com/wyre-technology/node-datto-rmm/commit/62fa082dc8ccaaea0cb4e6fcacdc36c4c3353192)), closes [wyre-technology/msp-claude-plugins#43](https://github.com/wyre-technology/msp-claude-plugins/issues/43)
-
-## [1.0.1](https://github.com/wyre-technology/node-datto-rmm/compare/v1.0.0...v1.0.1) (2026-03-02)
+## [1.0.4](https://github.com/WYRE-AI/node-datto-rmm/compare/v1.0.3...v1.0.4) (2026-06-08)
 
 
 ### Bug Fixes
 
-* require Node 22+ (semantic-release@25 compatibility) ([0884c17](https://github.com/wyre-technology/node-datto-rmm/commit/0884c17016342b041fc0165e9a29bc1efe18e553))
-* require Node 22+ (semantic-release@25 compatibility) ([f9508a5](https://github.com/wyre-technology/node-datto-rmm/commit/f9508a5f592236f4495f999e06738cd62f0f6815))
+* **security:** bump vitest + @vitest/coverage-v8 1.x -> 3.2.6 ([#25](https://github.com/WYRE-AI/node-datto-rmm/issues/25)) ([b2a431c](https://github.com/WYRE-AI/node-datto-rmm/commit/b2a431c0642c2ad1403e5f720914ed729480b8fe))
+
+## [1.0.3](https://github.com/WYRE-AI/node-datto-rmm/compare/v1.0.2...v1.0.3) (2026-05-20)
+
+
+### Bug Fixes
+
+* repair broken package exports and standardize on Node 22 ([#2](https://github.com/WYRE-AI/node-datto-rmm/issues/2)) ([6c10201](https://github.com/WYRE-AI/node-datto-rmm/commit/6c10201da1a5afc03994aac0f57666928d901df3))
+
+## [1.0.2](https://github.com/WYRE-AI/node-datto-rmm/compare/v1.0.1...v1.0.2) (2026-04-06)
+
+
+### Bug Fixes
+
+* defensively unwrap API responses to handle direct returns ([62fa082](https://github.com/WYRE-AI/node-datto-rmm/commit/62fa082dc8ccaaea0cb4e6fcacdc36c4c3353192)), closes [wyre-technology/msp-claude-plugins#43](https://github.com/wyre-technology/msp-claude-plugins/issues/43)
+
+## [1.0.1](https://github.com/WYRE-AI/node-datto-rmm/compare/v1.0.0...v1.0.1) (2026-03-02)
+
+
+### Bug Fixes
+
+* require Node 22+ (semantic-release@25 compatibility) ([0884c17](https://github.com/WYRE-AI/node-datto-rmm/commit/0884c17016342b041fc0165e9a29bc1efe18e553))
+* require Node 22+ (semantic-release@25 compatibility) ([f9508a5](https://github.com/WYRE-AI/node-datto-rmm/commit/f9508a5f592236f4495f999e06738cd62f0f6815))
 
 # 1.0.0 (2026-02-05)
 
