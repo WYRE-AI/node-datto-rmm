@@ -160,11 +160,12 @@ export class HttpClient {
     }
 
     const responseBody: unknown = parsedBody;
+    const detail = this.summarizeBody(responseBody);
 
     switch (response.status) {
       case 400:
         throw new DattoRmmAuthenticationError(
-          'Bad request - invalid credentials or parameters',
+          `Bad request (400) - invalid credentials or parameters: ${detail}`,
           400,
           responseBody
         );
@@ -173,7 +174,7 @@ export class HttpClient {
         // If this is already a retry after 401, don't retry again
         if (isRetryAfter401) {
           throw new DattoRmmAuthenticationError(
-            'Authentication failed after token refresh',
+            `Authentication failed after token refresh (401): ${detail}`,
             401,
             responseBody
           );
@@ -188,15 +189,19 @@ export class HttpClient {
         if (this.isIpBlockResponse(responseBody)) {
           this.rateLimiter.handleIpBlock();
           throw new DattoRmmIpBlockedError(
-            'IP has been blocked due to rate limit violations',
+            `IP has been blocked due to rate limit violations: ${detail}`,
             this.config.rateLimit.ipBlockCooldownMs,
             responseBody
           );
         }
-        throw new DattoRmmForbiddenError('Access forbidden', responseBody);
+        // Datto's own reason (wrong platform/region, missing scope, suspended
+        // account, ...) lives in `detail` — a bare "Access forbidden" hides
+        // exactly the information needed to tell those causes apart (the gap
+        // that stalled the Zinfandel-platform investigation, msg-1788213394271).
+        throw new DattoRmmForbiddenError(`Access forbidden (403): ${detail}`, responseBody);
 
       case 404:
-        throw new DattoRmmNotFoundError('Resource not found', responseBody);
+        throw new DattoRmmNotFoundError(`Resource not found (404): ${detail}`, responseBody);
 
       case 429:
         // Rate limited - retry with backoff
@@ -207,7 +212,7 @@ export class HttpClient {
           return this.executeRequest<T>(url, method, body, skipAuth, retryCount + 1, isRetryAfter401);
         }
         throw new DattoRmmRateLimitError(
-          'Rate limit exceeded and max retries reached',
+          `Rate limit exceeded and max retries reached (429): ${detail}`,
           this.config.rateLimit.retryAfterMs,
           responseBody
         );
@@ -220,17 +225,45 @@ export class HttpClient {
             return this.executeRequest<T>(url, method, body, skipAuth, 1, isRetryAfter401);
           }
           throw new DattoRmmServerError(
-            `Server error: ${response.status} ${response.statusText}`,
+            `Server error: ${response.status} ${response.statusText}: ${detail}`,
             response.status,
             responseBody
           );
         }
         throw new DattoRmmError(
-          `Request failed: ${response.status} ${response.statusText}`,
+          `Request failed: ${response.status} ${response.statusText}: ${detail}`,
           response.status,
           responseBody
         );
     }
+  }
+
+  /**
+   * Best-effort extraction of a human-readable detail from an error response
+   * body, for embedding directly in thrown error `.message` strings. Callers
+   * that only surface `error.message` (rather than the typed error's
+   * `.response`) still see Datto's real reported reason instead of a generic
+   * per-status label — same class of gap as connectwise-automate-mcp#54,
+   * where a swallowed body hid the actual cause from the caller.
+   */
+  private summarizeBody(body: unknown): string {
+    if (typeof body === 'string') {
+      const trimmed = body.trim();
+      return trimmed ? trimmed.slice(0, 500) : '(empty body)';
+    }
+    if (body && typeof body === 'object') {
+      const obj = body as Record<string, unknown>;
+      const message = obj.message ?? obj.error ?? obj.error_description ?? obj.detail;
+      if (typeof message === 'string' && message.trim()) {
+        return message.trim().slice(0, 500);
+      }
+      try {
+        return JSON.stringify(body).slice(0, 500);
+      } catch {
+        return '(unserializable body)';
+      }
+    }
+    return '(empty body)';
   }
 
   /**

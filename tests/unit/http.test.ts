@@ -12,7 +12,12 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { HttpClient } from '../../src/http.js';
 import { AuthManager } from '../../src/auth.js';
 import { RateLimiter } from '../../src/rate-limiter.js';
-import { DattoRmmError, DattoRmmNotFoundError, DattoRmmServerError } from '../../src/errors.js';
+import {
+  DattoRmmError,
+  DattoRmmForbiddenError,
+  DattoRmmNotFoundError,
+  DattoRmmServerError,
+} from '../../src/errors.js';
 import { DEFAULT_RATE_LIMIT_CONFIG, type ResolvedConfig } from '../../src/config.js';
 
 const config: ResolvedConfig = {
@@ -119,5 +124,62 @@ describe('HttpClient response handling', () => {
       .catch((e: unknown) => e);
     expect(err).toBeInstanceOf(DattoRmmError);
     expect((err as DattoRmmError).response).toBe('teapot');
+  });
+
+  describe('403 detail surfacing (regression: Zinfandel-platform investigation)', () => {
+    // A bare "Access forbidden" — the pre-fix message — hid whether Datto
+    // returned a permission-denied, wrong-platform, or account-suspended
+    // reason. Callers that only read `.message` (not the typed error's
+    // `.response`) need Datto's real reason inline.
+
+    it('embeds the JSON body\'s `message` field in the thrown error message', async () => {
+      vi.mocked(fetch).mockResolvedValue(
+        realResponse(JSON.stringify({ message: 'Account is suspended' }), { status: 403 })
+      );
+      const err = await makeClient()
+        .request('/account/sites')
+        .catch((e: unknown) => e);
+      expect(err).toBeInstanceOf(DattoRmmForbiddenError);
+      expect((err as DattoRmmForbiddenError).message).toContain('Account is suspended');
+      expect((err as DattoRmmForbiddenError).message).toContain('403');
+    });
+
+    it('falls back to a JSON dump when the body has no message/error/detail field', async () => {
+      vi.mocked(fetch).mockResolvedValue(
+        realResponse(JSON.stringify({ code: 'PLATFORM_MISMATCH' }), { status: 403 })
+      );
+      const err = await makeClient()
+        .request('/account/sites')
+        .catch((e: unknown) => e);
+      expect(err).toBeInstanceOf(DattoRmmForbiddenError);
+      expect((err as DattoRmmForbiddenError).message).toContain('PLATFORM_MISMATCH');
+    });
+
+    it('embeds a non-JSON error body verbatim (truncated)', async () => {
+      vi.mocked(fetch).mockResolvedValue(
+        realResponse('Forbidden by upstream WAF', {
+          status: 403,
+          headers: { 'content-type': 'text/plain' },
+        })
+      );
+      const err = await makeClient()
+        .request('/account/sites')
+        .catch((e: unknown) => e);
+      expect(err).toBeInstanceOf(DattoRmmForbiddenError);
+      expect((err as DattoRmmForbiddenError).message).toContain('Forbidden by upstream WAF');
+    });
+
+    it('still classifies an IP-block 403 as DattoRmmIpBlockedError, not ForbiddenError', async () => {
+      vi.mocked(fetch).mockResolvedValue(
+        realResponse(JSON.stringify({ message: 'Your IP has been blocked due to rate limits' }), {
+          status: 403,
+        })
+      );
+      const err = await makeClient()
+        .request('/account/sites')
+        .catch((e: unknown) => e);
+      expect(err).not.toBeInstanceOf(DattoRmmForbiddenError);
+      expect((err as { name: string }).name).toBe('DattoRmmIpBlockedError');
+    });
   });
 });
