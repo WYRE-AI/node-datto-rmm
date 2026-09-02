@@ -1,3 +1,10 @@
+## [1.0.11](https://github.com/WYRE-AI/node-datto-rmm/compare/v1.0.10...v1.0.11) (2026-09-02)
+
+
+### Bug Fixes
+
+* surface the real OAuth error body when token acquisition fails ([#67](https://github.com/WYRE-AI/node-datto-rmm/issues/67)) ([a6f727c](https://github.com/WYRE-AI/node-datto-rmm/commit/a6f727cd13afa720b2e7a898fd3e592b85a449a1))
+
 ## [1.0.10](https://github.com/WYRE-AI/node-datto-rmm/compare/v1.0.9...v1.0.10) (2026-09-01)
 
 
