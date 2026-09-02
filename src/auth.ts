@@ -4,6 +4,7 @@
 
 import type { ResolvedConfig } from './config.js';
 import { DattoRmmAuthenticationError } from './errors.js';
+import { summarizeErrorBody } from './error-detail.js';
 
 /**
  * Token information
@@ -138,9 +139,19 @@ export class AuthManager {
       });
 
       if (!response.ok) {
-        const errorBody = await response.text();
+        const rawBody = await response.text();
+        let errorBody: unknown = rawBody;
+        try {
+          errorBody = JSON.parse(rawBody);
+        } catch {
+          // Not JSON — summarizeErrorBody handles the raw string directly.
+        }
+        // Datto's OAuth token endpoint reports the real reason (e.g. RFC
+        // 6749 §5.2's invalid_grant for a bad key/secret pair) in the body,
+        // which a bare "400 Bad Request" hides from any caller that only
+        // reads `.message` instead of the typed error's `.response`.
         throw new DattoRmmAuthenticationError(
-          `Failed to acquire token: ${response.status} ${response.statusText}`,
+          `Failed to acquire token (${response.status}): ${summarizeErrorBody(errorBody)}`,
           response.status,
           errorBody
         );

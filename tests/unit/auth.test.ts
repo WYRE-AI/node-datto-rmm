@@ -60,6 +60,26 @@ describe('AuthManager', () => {
 
       await expect(authManager.getToken()).rejects.toThrow(DattoRmmAuthenticationError);
     });
+
+    it('embeds the real OAuth error (RFC 6749 invalid_grant) in the message, not just the status', async () => {
+      // Regression: a bare "Failed to acquire token: 400 Bad Request" hid
+      // whether Datto rejected the key/secret pair (invalid_grant) or the
+      // request shape itself — the same diagnosability gap fixed in http.ts.
+      server.use(
+        http.post('https://merlot-api.centrastage.net/auth/oauth/token', () => {
+          return HttpResponse.json(
+            { error: 'invalid_grant', error_description: 'Bad credentials' },
+            { status: 400 }
+          );
+        })
+      );
+
+      const err = await authManager.getToken().catch((e: unknown) => e);
+      expect(err).toBeInstanceOf(DattoRmmAuthenticationError);
+      expect((err as DattoRmmAuthenticationError).message).toContain('invalid_grant');
+      expect((err as DattoRmmAuthenticationError).message).toContain('Bad credentials');
+      expect((err as DattoRmmAuthenticationError).message).toContain('400');
+    });
   });
 
   describe('refreshToken', () => {

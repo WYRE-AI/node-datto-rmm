@@ -5,6 +5,7 @@
 import type { ResolvedConfig } from './config.js';
 import type { AuthManager } from './auth.js';
 import type { RateLimiter } from './rate-limiter.js';
+import { summarizeErrorBody } from './error-detail.js';
 import {
   DattoRmmError,
   DattoRmmAuthenticationError,
@@ -160,7 +161,7 @@ export class HttpClient {
     }
 
     const responseBody: unknown = parsedBody;
-    const detail = this.summarizeBody(responseBody);
+    const detail = summarizeErrorBody(responseBody);
 
     switch (response.status) {
       case 400:
@@ -236,34 +237,6 @@ export class HttpClient {
           responseBody
         );
     }
-  }
-
-  /**
-   * Best-effort extraction of a human-readable detail from an error response
-   * body, for embedding directly in thrown error `.message` strings. Callers
-   * that only surface `error.message` (rather than the typed error's
-   * `.response`) still see Datto's real reported reason instead of a generic
-   * per-status label — same class of gap as connectwise-automate-mcp#54,
-   * where a swallowed body hid the actual cause from the caller.
-   */
-  private summarizeBody(body: unknown): string {
-    if (typeof body === 'string') {
-      const trimmed = body.trim();
-      return trimmed ? trimmed.slice(0, 500) : '(empty body)';
-    }
-    if (body && typeof body === 'object') {
-      const obj = body as Record<string, unknown>;
-      const message = obj.message ?? obj.error ?? obj.error_description ?? obj.detail;
-      if (typeof message === 'string' && message.trim()) {
-        return message.trim().slice(0, 500);
-      }
-      try {
-        return JSON.stringify(body).slice(0, 500);
-      } catch {
-        return '(unserializable body)';
-      }
-    }
-    return '(empty body)';
   }
 
   /**
