@@ -182,7 +182,15 @@ jobs:
         with:
           app-id: ${{ secrets.WYRE_APP_ID }}
           private-key: ${{ secrets.WYRE_APP_PRIVATE_KEY }}
+          # Least-privilege (CodeRabbit + zizmor catch): with no
+          # `repositories` input, `owner` alone scopes the token to every
+          # repo the App installation covers, not just this one. And
+          # without an explicit `permission-*`, the token inherits the
+          # App's FULL installation permission set rather than just what
+          # this step actually uses. Pin both down.
           owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }}
+          permission-pull-requests: write
 
       - name: "Prepare: open or update release PR"
         if: steps.mode.outputs.mode == 'prepare' && steps.prepare.outputs.release_needed == 'true'
