@@ -1,0 +1,83 @@
+name: Release (publish on merge)
+
+# Phase 2 of the PR-based release flow (task_1788457898992). Fires when a
+# "chore(release): vX.Y.Z" PR from release-prepare.yml merges into main —
+# detected by the merge commit's own message prefix, not by re-analyzing
+# commits (phase 1 already decided the version; this phase trusts it and
+# just publishes). See the design doc:
+# orgs/wyre/deliverables/forge/task_1788457898992_56617697/design-pr-flow-release.md
+#
+# Tag pushes are NOT subject to the branch-protection rule blocking direct
+# pushes to main (that rule scopes refs/heads/main only) — verified against
+# this repo's actual branch-protection object and its (empty) rulesets
+# before relying on it here, not assumed.
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  publish:
+    name: Publish release
+    runs-on: ubuntu-latest
+    if: "startsWith(github.event.head_commit.message, 'chore(release): ')"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020  # v7.0.0
+        with:
+          node-version: '22'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@wyre-ai'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Determine version and skip if already tagged
+        id: version
+        run: |
+          set -euo pipefail
+          VERSION=$(jq -r '.version' package.json)
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          git fetch --tags
+          if git rev-parse "v${VERSION}" >/dev/null 2>&1; then
+            echo "Tag v${VERSION} already exists — nothing to do (re-run or duplicate trigger)."
+            echo "already_tagged=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "already_tagged=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Tag
+        if: steps.version.outputs.already_tagged == 'false'
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.version.outputs.version }}"
+          git tag "v${VERSION}"
+          git push origin "v${VERSION}"
+
+      - name: Publish to npm
+        if: steps.version.outputs.already_tagged == 'false'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm publish
+
+      - name: Create GitHub release
+        if: steps.version.outputs.already_tagged == 'false'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.version.outputs.version }}"
+          gh release create "v${VERSION}" --title "v${VERSION}" --generate-notes

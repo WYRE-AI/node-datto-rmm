@@ -1,0 +1,99 @@
+name: Release (prepare PR)
+
+# Phase 1 of the PR-based release flow (task_1788457898992, Aaron ruling
+# "pipeline: pr-flow" — branch protection now requires a PR on main, so
+# @semantic-release/git's direct push was failing with GH006. See the design
+# doc: orgs/wyre/deliverables/forge/task_1788457898992_56617697/design-pr-flow-release.md
+#
+# This job computes the next version + notes via semantic-release's own
+# --dry-run Node API (scripts/prepare-release.mjs — guaranteed no git/npm/
+# GitHub side effects), bumps package.json + CHANGELOG.md locally, and opens
+# (or updates) a "chore(release): vX.Y.Z" PR into main instead of pushing
+# directly. That PR merges through the normal review gate — see the design
+# doc for why this is a human click, not a bot auto-merge.
+#
+# Guard against re-triggering on the release-PR's own merge commit: without
+# this, merging the release PR would re-run this job, see no NEW commits to
+# analyze beyond what it already covered, and (harmlessly but pointlessly)
+# no-op — cheap enough not to matter, but the `if:` below skips it outright
+# for clarity, since a commit starting with "chore(release): " is always this
+# workflow's own output, never a thing to re-prepare a release FOR.
+#
+# One standing branch (release/next), force-pushed each qualifying run —
+# reviewers always find the release PR in the same place; if new releasable
+# commits land while the PR is still open, the branch and PR content update
+# in place rather than accumulating duplicate PRs. Documented tradeoff (see
+# design doc risk #2): a reviewer mid-review could see the diff change under
+# them if that happens. Acceptable at this repo's release cadence.
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  prepare:
+    name: Prepare release PR
+    runs-on: ubuntu-latest
+    if: "!startsWith(github.event.head_commit.message, 'chore(release): ')"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020  # v7.0.0
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Run tests
+        run: npm test
+
+      - name: Compute next version and bump files
+        id: prepare
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/prepare-release.mjs
+
+      - name: Open or update release PR
+        if: steps.prepare.outputs.release_needed == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.prepare.outputs.version }}
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git checkout -B release/next
+          git add package.json package-lock.json CHANGELOG.md 2>/dev/null || git add package.json CHANGELOG.md
+          git commit -m "chore(release): ${VERSION}
+
+          Prepared by scripts/prepare-release.mjs. Merging this PR triggers
+          release-publish.yml, which tags, publishes to npm, and creates the
+          GitHub release — nothing publishes until this merges."
+          git push --force origin release/next
+
+          if gh pr view release/next --json state --jq .state 2>/dev/null | grep -q OPEN; then
+            gh pr edit release/next --title "chore(release): ${VERSION}"
+            echo "Updated existing release PR."
+          else
+            gh pr create \
+              --base main \
+              --head release/next \
+              --title "chore(release): ${VERSION}" \
+              --body "Automated release PR (phase 1 of the PR-based release flow). Merging this publishes ${VERSION} to npm and creates the GitHub release — see CHANGELOG.md in this diff for the notes."
+            echo "Opened new release PR."
+          fi
