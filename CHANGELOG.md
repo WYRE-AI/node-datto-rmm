@@ -1,3 +1,12 @@
+## [1.0.12](https://github.com/WYRE-AI/node-datto-rmm/compare/v1.0.11...v1.0.12) (2026-09-03)
+
+
+### Bug Fixes
+
+* **release:** mint a GitHub App token for the release-PR step ([#72](https://github.com/WYRE-AI/node-datto-rmm/issues/72)) ([e18b96f](https://github.com/WYRE-AI/node-datto-rmm/commit/e18b96fb86339c194adfd713ee13c8320fe98199))
+* **security:** resolve dependabot alerts via npm audit fix ([#68](https://github.com/WYRE-AI/node-datto-rmm/issues/68)) ([037cc26](https://github.com/WYRE-AI/node-datto-rmm/commit/037cc2645ae89242e7c4bb4d2752508180bf9a7e))
+
+
 ## [1.0.11](https://github.com/WYRE-AI/node-datto-rmm/compare/v1.0.10...v1.0.11) (2026-09-02)
 
 
