@@ -40,6 +40,16 @@ on:
     branches:
       - main
 
+# Serializes runs on main so two merges landing close together can't both
+# reach mode-determination before either has tagged/published (murph,
+# review catch): without this, a second run could check out a commit that
+# still has no tag for the current package.json version and independently
+# decide PUBLISH mode for the same version as an in-flight first run. Not
+# cancel-in-progress — queues instead of dropping a run, since dropping a
+# release attempt is worse than a short wait.
+concurrency:
+  group: release-${{ github.ref }}
+
 permissions:
   contents: write
   pull-requests: write
