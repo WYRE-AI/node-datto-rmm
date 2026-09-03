@@ -81,25 +81,50 @@ jobs:
       - name: Run tests
         run: npm test
 
+      # Each of the three publish artifacts (tag, npm package, GitHub release)
+      # is checked independently rather than inferring all-or-nothing status
+      # from the tag alone (CodeRabbit catch, review of this PR: a transient
+      # npm-publish or gh-release failure after the tag push would otherwise
+      # strand the version forever — the next run sees the tag, calls it
+      # steady state, and never retries the artifacts that actually failed).
+      # This makes a rerun after a partial failure resume exactly the
+      # missing steps instead of silently skipping them.
       - name: Determine mode (publish vs prepare)
         id: mode
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           git fetch --tags
           VERSION=$(jq -r '.version' package.json)
-          if git rev-parse "v${VERSION}" >/dev/null 2>&1; then
-            echo "No pending version bump (v${VERSION} already tagged) — steady state."
+          PKG_NAME=$(jq -r '.name' package.json)
+
+          TAG_EXISTS=false
+          git rev-parse "v${VERSION}" >/dev/null 2>&1 && TAG_EXISTS=true
+
+          NPM_PUBLISHED=false
+          npm view "${PKG_NAME}@${VERSION}" version >/dev/null 2>&1 && NPM_PUBLISHED=true
+
+          RELEASE_EXISTS=false
+          gh release view "v${VERSION}" >/dev/null 2>&1 && RELEASE_EXISTS=true
+
+          if [ "$TAG_EXISTS" = true ] && [ "$NPM_PUBLISHED" = true ] && [ "$RELEASE_EXISTS" = true ]; then
+            echo "v${VERSION} fully published (tag+npm+release) — steady state."
             echo "mode=prepare" >> "$GITHUB_OUTPUT"
           else
-            echo "package.json is ahead of tags (v${VERSION} not yet tagged) — a release PR just merged."
+            echo "v${VERSION} not fully published (tag=${TAG_EXISTS} npm=${NPM_PUBLISHED} release=${RELEASE_EXISTS}) — publishing/resuming."
             echo "mode=publish" >> "$GITHUB_OUTPUT"
             echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+            echo "tag_exists=${TAG_EXISTS}" >> "$GITHUB_OUTPUT"
+            echo "npm_published=${NPM_PUBLISHED}" >> "$GITHUB_OUTPUT"
+            echo "release_exists=${RELEASE_EXISTS}" >> "$GITHUB_OUTPUT"
           fi
 
       # --- PUBLISH mode: package.json was already bumped by a merged release PR ---
 
       - name: "Publish: tag"
-        if: steps.mode.outputs.mode == 'publish'
+        if: steps.mode.outputs.mode == 'publish' && steps.mode.outputs.tag_exists == 'false'
         run: |
           set -euo pipefail
           VERSION="${{ steps.mode.outputs.version }}"
@@ -107,13 +132,13 @@ jobs:
           git push origin "v${VERSION}"
 
       - name: "Publish: npm publish"
-        if: steps.mode.outputs.mode == 'publish'
+        if: steps.mode.outputs.mode == 'publish' && steps.mode.outputs.npm_published == 'false'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm publish
 
       - name: "Publish: create GitHub release"
-        if: steps.mode.outputs.mode == 'publish'
+        if: steps.mode.outputs.mode == 'publish' && steps.mode.outputs.release_exists == 'false'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -128,6 +153,13 @@ jobs:
         id: prepare
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # @semantic-release/npm has npmPublish:true in .releaserc.json, so
+          # verifyConditions authenticates against the registry even under
+          # dryRun (CodeRabbit catch, first review round — the thread is
+          # marked outdated because release-prepare.yml was deleted in the
+          # single-workflow rewrite, not because the underlying auth gap was
+          # fixed there; it applies equally here).
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node scripts/prepare-release.mjs
 
       - name: "Prepare: open or update release PR"
