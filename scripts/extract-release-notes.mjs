@@ -30,10 +30,17 @@ try {
 
 // semantic-release-changelog headings look like:
 //   ## [1.0.12](https://github.com/.../compare/v1.0.11...v1.0.12) (2026-09-03)
-// Match on the bracketed version only -- everything else (link, date) varies
-// per repo/version and isn't part of the identity.
+// for a patch, but a single '#' for a minor/major release, e.g.:
+//   # [2.0.0](https://github.com/.../compare/v1.0.2...v2.0.0) (2026-07-28)
+// (murph, task_1788458278413: matching only '##' both fails to find a
+// minor/major version's own section, AND fails to recognize one as the
+// boundary that closes a preceding patch section -- reproduced against
+// node-crewhu's real CHANGELOG.md, where extracting 2.0.1 silently
+// swallowed all of the following 2.0.0 section, including its BREAKING
+// CHANGES block, into 2.0.1's "notes"). Match 1 or 2 leading '#'s so both
+// heading levels are recognized as section boundaries.
 const lines = changelog.split('\n');
-const headingRe = /^## \[([^\]]+)\]/;
+const headingRe = /^#{1,2} \[([^\]]+)\]/;
 let start = -1;
 let end = lines.length;
 
