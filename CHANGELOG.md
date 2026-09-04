@@ -1,3 +1,13 @@
+## [1.0.13](https://github.com/WYRE-AI/node-datto-rmm/compare/v1.0.12...v1.0.13) (2026-09-04)
+
+
+### Bug Fixes
+
+* declare Node globals in prepare-release.mjs for eslint ([#73](https://github.com/WYRE-AI/node-datto-rmm/issues/73)) ([9808250](https://github.com/WYRE-AI/node-datto-rmm/commit/98082506acbc176d1466b0bde78954eddad5aa59)), closes [WYRE-AI/node-atera#78](https://github.com/WYRE-AI/node-atera/issues/78)
+* **release:** add contents:read to the App token for gh pr create ([#75](https://github.com/WYRE-AI/node-datto-rmm/issues/75)) ([61ccc2b](https://github.com/WYRE-AI/node-datto-rmm/commit/61ccc2baf34ea7a2421b6f916fb837677821bb96)), closes [WYRE-AI/node-crewhu#46](https://github.com/WYRE-AI/node-crewhu/issues/46)
+* **release:** restore persist-credentials:false, re-auth only for release ops ([#76](https://github.com/WYRE-AI/node-datto-rmm/issues/76)) ([b69c20a](https://github.com/WYRE-AI/node-datto-rmm/commit/b69c20a81e245b7889f5a38b23906ce59cc65d84))
+
+
 ## [1.0.12](https://github.com/WYRE-AI/node-datto-rmm/compare/v1.0.11...v1.0.12) (2026-09-03)
 
 
