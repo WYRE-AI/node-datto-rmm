@@ -1,3 +1,11 @@
+# [1.1.0](https://github.com/WYRE-AI/node-datto-rmm/compare/v1.0.13...v1.1.0) (2026-09-04)
+
+
+### Features
+
+* **release:** use extracted CHANGELOG notes instead of --generate-notes ([#77](https://github.com/WYRE-AI/node-datto-rmm/issues/77)) ([78ff24f](https://github.com/WYRE-AI/node-datto-rmm/commit/78ff24f1ee510185f3b78a1636a73453b81494c0))
+
+
 ## [1.0.13](https://github.com/WYRE-AI/node-datto-rmm/compare/v1.0.12...v1.0.13) (2026-09-04)
 
 
