@@ -4,6 +4,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { DattoRmmClient } from '../../src/client.js';
+import type { QuickJobRequest } from '../../src/types/devices.js';
 
 describe('Devices Resource', () => {
   const client = new DattoRmmClient({
@@ -64,12 +65,29 @@ describe('Devices Resource', () => {
     it('should create a quick job for a device', async () => {
       const job = await client.devices.createQuickJob('device-uid-001', {
         jobName: 'Restart Service',
-        componentUid: 'component-uid-001',
-        variables: { serviceName: 'Spooler' },
+        jobComponent: {
+          componentUid: 'component-uid-001',
+          variables: [{ name: 'serviceName', value: 'Spooler' }],
+        },
       });
 
       expect(job.uid).toBe('job-uid-001');
       expect(job.status).toBe('active');
+    });
+
+    it('should reject a flat/legacy request body', async () => {
+      // The API 400s a body that doesn't nest componentUid/variables under
+      // jobComponent. Cast through unknown since the point is to prove the
+      // runtime wire contract, not something the compiler would allow.
+      const legacyBody = {
+        jobName: 'Restart Service',
+        componentUid: 'component-uid-001',
+        variables: { serviceName: 'Spooler' },
+      } as unknown as QuickJobRequest;
+
+      await expect(client.devices.createQuickJob('device-uid-001', legacyBody)).rejects.toThrow(
+        /Failed to read request/
+      );
     });
   });
 
