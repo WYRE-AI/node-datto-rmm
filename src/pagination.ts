@@ -80,7 +80,8 @@ export function createPaginatedIterable<T>(
   baseUrl: string,
   path: string,
   itemsKey: string,
-  params?: PaginationParams
+  params?: PaginationParams,
+  filters?: Record<string, string | number | undefined>
 ): PaginatedIterable<T> {
   // Build the initial URL with parameters
   let url = `${baseUrl}/api/v2${path}`;
@@ -91,6 +92,18 @@ export function createPaginatedIterable<T>(
   }
   if (params?.max) {
     searchParams.append('max', String(params.max));
+  }
+
+  // Resource-specific filters (e.g. activity-log categories) must reach the
+  // first request. Subsequent pages carry them automatically, since the API
+  // echoes them back in nextPageUrl. Without this, listAll() would silently
+  // return unfiltered results while appearing to filter.
+  if (filters) {
+    for (const [key, value] of Object.entries(filters)) {
+      if (value !== undefined) {
+        searchParams.append(key, String(value));
+      }
+    }
   }
 
   const queryString = searchParams.toString();

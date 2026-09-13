@@ -236,7 +236,21 @@ export const handlers = [
   }),
 
   // Activity logs
-  http.get(`${API_BASE}/activity-logs`, () => {
+  http.get(`${API_BASE}/activity-logs`, ({ request }) => {
+    const url = new URL(request.url);
+    const categories = url.searchParams.get('categories');
+
+    if (categories) {
+      const wanted = categories.split(',');
+      const filtered = fixtures.activityLogs.list.activities.filter((activity) =>
+        wanted.includes(activity.category)
+      );
+      return HttpResponse.json({
+        ...fixtures.activityLogs.list,
+        activities: filtered,
+      });
+    }
+
     return HttpResponse.json(fixtures.activityLogs.list);
   }),
 

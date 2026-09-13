@@ -9,6 +9,12 @@ import type { ActivityLog, ActivityLogParams, ActivityLogsResponse } from '../ty
 
 /**
  * Activity logs resource operations
+ *
+ * Note: the API paginates activity logs via the `nextPageUrl`/`searchAfter`
+ * cursor returned in `pageDetails`, not a simple page number — `listAll()`
+ * follows that cursor automatically, but requesting a specific `page` number
+ * directly (e.g. via `list({ page: 2 })`) may not behave as expected since
+ * the API does not paginate this resource by page number.
  */
 export class ActivityLogsResource {
   private readonly httpClient: HttpClient;
@@ -28,20 +34,9 @@ export class ActivityLogsResource {
     if (params) {
       if (params.page !== undefined) queryParams['page'] = params.page;
       if (params.max !== undefined) queryParams['max'] = params.max;
-      if (params.startDate !== undefined) {
-        queryParams['startDate'] = typeof params.startDate === 'number'
-          ? params.startDate
-          : new Date(params.startDate).getTime();
-      }
-      if (params.endDate !== undefined) {
-        queryParams['endDate'] = typeof params.endDate === 'number'
-          ? params.endDate
-          : new Date(params.endDate).getTime();
-      }
-      if (params.activityType !== undefined) queryParams['activityType'] = params.activityType;
-      if (params.user !== undefined) queryParams['user'] = params.user;
-      if (params.siteUid !== undefined) queryParams['siteUid'] = params.siteUid;
-      if (params.deviceUid !== undefined) queryParams['deviceUid'] = params.deviceUid;
+      if (params.categories !== undefined) queryParams['categories'] = params.categories;
+      if (params.actions !== undefined) queryParams['actions'] = params.actions;
+      if (params.entities !== undefined) queryParams['entities'] = params.entities;
     }
 
     return this.httpClient.request<ActivityLogsResponse>('/activity-logs', {
@@ -51,14 +46,22 @@ export class ActivityLogsResource {
 
   /**
    * List all activity logs with automatic pagination
+   *
+   * Follows the `nextPageUrl`/`searchAfter` cursor in `pageDetails` rather
+   * than a page number, since that is how this resource actually paginates.
    */
   listAll(params?: ActivityLogParams): PaginatedIterable<ActivityLog> {
     return createPaginatedIterable<ActivityLog>(
       this.httpClient,
       this.config.apiUrl,
       '/activity-logs',
-      'activityLogs',
-      { page: params?.page, max: params?.max }
+      'activities',
+      { page: params?.page, max: params?.max },
+      {
+        categories: params?.categories,
+        actions: params?.actions,
+        entities: params?.entities,
+      }
     );
   }
 }
