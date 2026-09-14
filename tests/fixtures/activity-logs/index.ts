@@ -9,11 +9,11 @@ export const list = {
     prevPageUrl: null,
     nextPageUrl: null,
   },
-  activityLogs: [
+  activities: [
     {
       id: 'activity-001',
       activityType: 'device.alert.resolved',
-      category: 'Alerts',
+      category: 'alert',
       description: 'Alert resolved: Disk usage high',
       user: 'admin@testmsp.com',
       userEmail: 'admin@testmsp.com',
@@ -27,7 +27,7 @@ export const list = {
     {
       id: 'activity-002',
       activityType: 'job.completed',
-      category: 'Jobs',
+      category: 'job',
       description: 'Quick job completed: Restart Service',
       user: 'admin@testmsp.com',
       userEmail: 'admin@testmsp.com',

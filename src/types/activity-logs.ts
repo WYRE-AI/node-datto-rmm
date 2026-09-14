@@ -38,24 +38,24 @@ export interface ActivityLog {
 
 /**
  * Activity log list parameters
+ *
+ * Note (verified against the live API on 2026-09-14): `startDate`, `endDate`,
+ * `activityType`, `user`, `siteUid` and `deviceUid` are NOT supported by the
+ * API — it silently ignores them and returns the same unfiltered result set
+ * regardless of their value, so they have been removed. `categories`,
+ * `actions` and `entities` are the only filters the API actually honours.
  */
 export interface ActivityLogParams {
   /** Page number */
   page?: number;
   /** Maximum results per page */
   max?: number;
-  /** Start date (Unix timestamp ms or ISO string) */
-  startDate?: number | string;
-  /** End date (Unix timestamp ms or ISO string) */
-  endDate?: number | string;
-  /** Filter by activity type */
-  activityType?: string;
-  /** Filter by user */
-  user?: string;
-  /** Filter by site UID */
-  siteUid?: Uid;
-  /** Filter by device UID */
-  deviceUid?: Uid;
+  /** Filter by category. Accepts a comma-separated list (e.g. `'job,patch'`). Verified 2026-09-14. */
+  categories?: string;
+  /** Filter by action. Accepts a comma-separated list (e.g. `'create,update'`). Verified 2026-09-14. */
+  actions?: string;
+  /** Filter by entity type. Accepts a comma-separated list (e.g. `'USER,DEVICE'`). Verified 2026-09-14. */
+  entities?: string;
 }
 
 /**
@@ -65,5 +65,5 @@ export interface ActivityLogsResponse {
   /** Page details */
   pageDetails: PageDetails;
   /** List of activity logs */
-  activityLogs: ActivityLog[];
+  activities: ActivityLog[];
 }
