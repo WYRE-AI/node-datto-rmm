@@ -66,15 +66,38 @@ export interface Device {
 }
 
 /**
+ * A single variable passed to a quick job component
+ */
+export interface QuickJobVariable {
+  /** Variable name */
+  name: string;
+  /** Variable value */
+  value: string;
+}
+
+/**
+ * Component to run as part of a quick job
+ */
+export interface QuickJobComponent {
+  /** Component UID to run */
+  componentUid: Uid;
+  /** Variables to pass to the component */
+  variables?: QuickJobVariable[];
+}
+
+/**
  * Quick job creation request
+ *
+ * Note: the API requires `componentUid`/`variables` nested under
+ * `jobComponent`, with `variables` as an array of `{ name, value }` pairs.
+ * A flat body (componentUid/variables at the top level, variables as a
+ * map) is rejected with HTTP 400 `{"errorMessage":"Failed to read request"}`.
  */
 export interface QuickJobRequest {
   /** Job name */
   jobName: string;
-  /** Component UID to run */
-  componentUid: Uid;
-  /** Variables to pass to the component */
-  variables?: Record<string, string>;
+  /** Component to run and its variables */
+  jobComponent: QuickJobComponent;
 }
 
 /**

@@ -137,7 +137,18 @@ export const handlers = [
     return HttpResponse.json(fixtures.devices.moved);
   }),
 
-  http.put(`${API_BASE}/device/:deviceUid/quickjob`, () => {
+  http.put(`${API_BASE}/device/:deviceUid/quickjob`, async ({ request }) => {
+    const body = (await request.json()) as {
+      jobComponent?: { componentUid?: unknown; variables?: unknown };
+    };
+
+    const jobComponent = body.jobComponent;
+    const variablesAreValid = jobComponent?.variables === undefined || Array.isArray(jobComponent.variables);
+
+    if (!jobComponent || !jobComponent.componentUid || !variablesAreValid) {
+      return HttpResponse.json({ errorMessage: 'Failed to read request' }, { status: 400 });
+    }
+
     return HttpResponse.json(fixtures.devices.quickJobCreated);
   }),
 
