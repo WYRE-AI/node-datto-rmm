@@ -76,5 +76,10 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.67.0",
     "vitest": "^4.1.8"
+  },
+  "overrides": {
+    "cosmiconfig": {
+      "js-yaml": "^4.3.2"
+    }
   }
 }
