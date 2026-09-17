@@ -1,3 +1,41 @@
+## [2.0.0](https://github.com/WYRE-AI/node-datto-rmm/compare/v1.1.0...v2.0.0) (2026-09-15)
+
+### Changed
+
+* fix(activity-logs)!: correct response field and supported filter params ([#82](https://github.com/WYRE-AI/node-datto-rmm/issues/82)) ([9f8e680](https://github.com/WYRE-AI/node-datto-rmm/commit/9f8e68074940126deef08a1b4d8cb97169a8300c))
+* fix(devices)!: nest QuickJobRequest componentUid/variables under jobComponent ([#81](https://github.com/WYRE-AI/node-datto-rmm/issues/81)) ([d7ebc98](https://github.com/WYRE-AI/node-datto-rmm/commit/d7ebc98914c67a55bc8bbdca425c959055e2c27b))
+
+### Security
+
+* **deps:** resolve js-yaml CVE-2026-84375 ([#84](https://github.com/WYRE-AI/node-datto-rmm/issues/84)) ([1cd7d49](https://github.com/WYRE-AI/node-datto-rmm/commit/1cd7d49cc42d5287902ffda0bf8c74dd631a5b1c))
+
+
+### BREAKING CHANGES
+
+* QuickJobRequest consumers must move componentUid and
+variables into a nested jobComponent object, and convert variables from
+a Record<string, string> map to a QuickJobVariable[] array of
+{name, value} pairs. The previous flat shape never worked against the
+live API (every call 400'd with "Failed to read request"), so no
+working code depended on it and none can break.
+
+
+Claude-Session: https://claude.ai/code/session_01TDheWRM33umHvBpF9H7gJa
+
+Co-authored-by: Claude Opus 5 <noreply@anthropic.com>
+* `ActivityLogsResponse.activityLogs` is renamed to
+`ActivityLogsResponse.activities`. `ActivityLogParams` no longer accepts
+`startDate`, `endDate`, `activityType`, `user`, `siteUid`, or
+`deviceUid` — none of these ever had any effect against the real API,
+so no working filter behaviour is lost by removing them. Callers should
+migrate to `categories`, `actions`, and/or `entities` instead.
+
+
+Claude-Session: https://claude.ai/code/session_01TDheWRM33umHvBpF9H7gJa
+
+Co-authored-by: Claude Opus 5 <noreply@anthropic.com>
+
+
 ## [Unreleased]
 
 ### Security
