@@ -1,11 +1,11 @@
-# [2.0.0](https://github.com/WYRE-AI/node-datto-rmm/compare/v1.1.0...v2.0.0) (2026-09-15)
+## [2.0.0](https://github.com/WYRE-AI/node-datto-rmm/compare/v1.1.0...v2.0.0) (2026-09-15)
 
+### Changed
 
 * fix(activity-logs)!: correct response field and supported filter params ([#82](https://github.com/WYRE-AI/node-datto-rmm/issues/82)) ([9f8e680](https://github.com/WYRE-AI/node-datto-rmm/commit/9f8e68074940126deef08a1b4d8cb97169a8300c))
 * fix(devices)!: nest QuickJobRequest componentUid/variables under jobComponent ([#81](https://github.com/WYRE-AI/node-datto-rmm/issues/81)) ([d7ebc98](https://github.com/WYRE-AI/node-datto-rmm/commit/d7ebc98914c67a55bc8bbdca425c959055e2c27b))
 
-
-### Bug Fixes
+### Security
 
 * **deps:** resolve js-yaml CVE-2026-84375 ([#84](https://github.com/WYRE-AI/node-datto-rmm/issues/84)) ([1cd7d49](https://github.com/WYRE-AI/node-datto-rmm/commit/1cd7d49cc42d5287902ffda0bf8c74dd631a5b1c))
 
