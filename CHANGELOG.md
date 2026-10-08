@@ -1,3 +1,12 @@
+## [2.0.1](https://github.com/WYRE-AI/node-datto-rmm/compare/v2.0.0...v2.0.1) (2026-10-08)
+
+
+### Bug Fixes
+
+* **release:** disable http.followRedirects on authenticated git commands ([#85](https://github.com/WYRE-AI/node-datto-rmm/issues/85)) ([13cf77d](https://github.com/WYRE-AI/node-datto-rmm/commit/13cf77d6bd7ae42051c0ba242b75bb744c20c5b2))
+* **release:** push release/next with App token + recognize unbracketed CHANGELOG headings ([#91](https://github.com/WYRE-AI/node-datto-rmm/issues/91)) ([7215d6d](https://github.com/WYRE-AI/node-datto-rmm/commit/7215d6dac09153faf7c9fa25669a0044a74c0dc8)), closes [WYRE-AI/node-domotz#52](https://github.com/WYRE-AI/node-domotz/issues/52)
+
+
 ## [2.0.0](https://github.com/WYRE-AI/node-datto-rmm/compare/v1.1.0...v2.0.0) (2026-09-15)
 
 ### Changed
