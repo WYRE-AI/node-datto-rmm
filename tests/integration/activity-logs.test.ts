@@ -18,21 +18,17 @@ describe('Activity Logs Resource', () => {
 
       expect(response.pageDetails).toBeDefined();
       expect(response.activities).toHaveLength(2);
-      expect(response.activities[0]?.activityType).toBe('device.alert.resolved');
+      expect(response.activities[0]?.category).toBe('account');
+      expect(response.activities[0]?.action).toBe('login');
     });
 
-    it('should include user information', async () => {
-      const response = await client.activityLogs.list();
+    it('should include user, site and device information', async () => {
+      const response = await client.activityLogs.list({ order: 'asc' });
 
-      expect(response.activities[0]?.user).toBe('admin@testmsp.com');
-      expect(response.activities[0]?.userEmail).toBe('admin@testmsp.com');
-    });
-
-    it('should include device information when applicable', async () => {
-      const response = await client.activityLogs.list();
-
-      expect(response.activities[0]?.deviceUid).toBe('device-uid-001');
-      expect(response.activities[0]?.deviceHostname).toBe('DESKTOP-001');
+      expect(response.activities[0]?.hostname).toBe('DESKTOP-001');
+      expect(response.activities[0]?.deviceId).toBe(555);
+      expect(response.activities[1]?.user?.userName).toBe('admin@testmsp.com');
+      expect(response.activities[1]?.site?.id).toBe(1001);
     });
 
     it('should send the categories filter and return only matching entries', async () => {
@@ -40,6 +36,30 @@ describe('Activity Logs Resource', () => {
 
       expect(response.activities).toHaveLength(1);
       expect(response.activities.every((activity) => activity.category === 'job')).toBe(true);
+    });
+
+    it('should send from/until as query parameters', async () => {
+      const response = await client.activityLogs.list({
+        from: '2024-01-31T23:50:00Z',
+        until: '2024-01-31T23:55:00Z',
+      });
+      expect(response.activities.map((a) => a.id)).toEqual(['activity-002']);
+    });
+
+    it('should join array siteIds into a comma-separated list', async () => {
+      const response = await client.activityLogs.list({ siteIds: [1001, 2002] });
+      expect(response.activities).toHaveLength(2);
+
+      const none = await client.activityLogs.list({ siteIds: [2002] });
+      expect(none.activities).toHaveLength(0);
+    });
+
+    it('should send order', async () => {
+      const asc = await client.activityLogs.list({ order: 'asc' });
+      const desc = await client.activityLogs.list({ order: 'desc' });
+
+      expect(asc.activities.map((a) => a.id)).toEqual(['activity-002', 'activity-001']);
+      expect(desc.activities.map((a) => a.id)).toEqual(['activity-001', 'activity-002']);
     });
   });
 
@@ -58,6 +78,16 @@ describe('Activity Logs Resource', () => {
 
       expect(activities).toHaveLength(1);
       expect(activities.every((activity) => activity.category === 'job')).toBe(true);
+    });
+
+    it('should carry the time range, siteIds and order onto the first request', async () => {
+      const activities = await client.activityLogs
+        .listAll({ siteIds: [2002], from: '2024-01-01T00:00:00Z' })
+        .toArray();
+      expect(activities).toHaveLength(0);
+
+      const ordered = await client.activityLogs.listAll({ order: 'asc' }).toArray();
+      expect(ordered.map((a) => a.id)).toEqual(['activity-002', 'activity-001']);
     });
   });
 });
