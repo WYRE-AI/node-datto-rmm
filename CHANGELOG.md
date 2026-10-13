@@ -1,3 +1,11 @@
+## [2.0.2](https://github.com/WYRE-AI/node-datto-rmm/compare/v2.0.1...v2.0.2) (2026-10-13)
+
+
+### Bug Fixes
+
+* **dependabot:** ungroup msw/vitest majors from auto-merged dev-dependencies ([#96](https://github.com/WYRE-AI/node-datto-rmm/issues/96)) ([b9f92f4](https://github.com/WYRE-AI/node-datto-rmm/commit/b9f92f4bad2ac944ace89bf5d810bc032a214444))
+
+
 ## [2.0.1](https://github.com/WYRE-AI/node-datto-rmm/compare/v2.0.0...v2.0.1) (2026-10-08)
 
 
