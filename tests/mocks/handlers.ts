@@ -250,19 +250,36 @@ export const handlers = [
   http.get(`${API_BASE}/activity-logs`, ({ request }) => {
     const url = new URL(request.url);
     const categories = url.searchParams.get('categories');
+    const siteIds = url.searchParams.get('siteIds');
+    const from = url.searchParams.get('from');
+    const until = url.searchParams.get('until');
+    const order = url.searchParams.get('order');
+
+    let activities = [...fixtures.activityLogs.list.activities];
 
     if (categories) {
       const wanted = categories.split(',');
-      const filtered = fixtures.activityLogs.list.activities.filter((activity) =>
-        wanted.includes(activity.category)
-      );
-      return HttpResponse.json({
-        ...fixtures.activityLogs.list,
-        activities: filtered,
-      });
+      activities = activities.filter((activity) => wanted.includes(activity.category));
+    }
+    if (siteIds) {
+      const wanted = siteIds.split(',').map(Number);
+      activities = activities.filter((activity) => wanted.includes(activity.site.id));
+    }
+    if (from) {
+      const fromSec = Date.parse(from) / 1000;
+      activities = activities.filter((activity) => activity.date >= fromSec);
+    }
+    if (until) {
+      const untilSec = Date.parse(until) / 1000;
+      activities = activities.filter((activity) => activity.date <= untilSec);
+    }
+    if (order === 'asc') {
+      activities.sort((a, b) => a.date - b.date);
+    } else {
+      activities.sort((a, b) => b.date - a.date);
     }
 
-    return HttpResponse.json(fixtures.activityLogs.list);
+    return HttpResponse.json({ ...fixtures.activityLogs.list, activities });
   }),
 
   // Rate limit test endpoint
