@@ -1,3 +1,11 @@
+## [2.0.3](https://github.com/WYRE-AI/node-datto-rmm/compare/v2.0.2...v2.0.3) (2026-11-16)
+
+
+### Bug Fixes
+
+* never retry HTTP 429, and report 429 and IP blocks clearly ([#105](https://github.com/WYRE-AI/node-datto-rmm/issues/105)) ([55600ad](https://github.com/WYRE-AI/node-datto-rmm/commit/55600adb17edc366f21b7868ec38e198f51b0b78))
+
+
 ## [Unreleased]
 
 ### Fixed
